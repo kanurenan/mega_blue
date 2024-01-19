@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'mega_blue_platform_interface.dart';
 
@@ -11,7 +12,23 @@ class MethodChannelMegaBlue extends MegaBluePlatform {
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version =
+        await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
+  }
+
+  @override
+  Future<bool?> isDeviceConnected() async {
+    final isConnected =
+        await methodChannel.invokeMethod<bool>('isDeviceConnected');
+    return isConnected;
+  }
+
+  @override
+  Future<void> checkPermission() async {
+    final isGranted = await Permission.bluetooth.isGranted;
+    if (!isGranted) {
+      await Permission.bluetooth.request();
+    }
   }
 }
