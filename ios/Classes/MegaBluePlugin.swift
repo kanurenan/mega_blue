@@ -6,22 +6,26 @@ public class MegaBluePlugin: NSObject, FlutterPlugin {
     var channel : FlutterMethodChannel?
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "mega_blue", binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(name: "megaflutter/mega_blue", binaryMessenger: registrar.messenger())
         let instance = MegaBluePlugin()
         registrar.addMethodCallDelegate(instance, channel: channel )
         instance.channel = channel
     }
     
-    private let PLATFORM_VERSION = "getPlatformVersion"
-    private let GET_DEVICE_LIST = "getDeviceList"
+    private let CURRENT_STATE = "getCurrentState"
+    private let DEVICE_NAME = "getDeviceName"
+    private let LIST_DEVICES = "listAllAudioDevices"
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
-        case PLATFORM_VERSION:
-            result("iOS " + UIDevice.current.systemVersion)
+        case CURRENT_STATE:
+            result(HeadsetIsConnect())
             break;
-        case GET_DEVICE_LIST:
-            result("iOS " + UIDevice.current.systemVersion)
+        case DEVICE_NAME:
+            result(HeadsetDeviceName())
+            break;
+        case LIST_DEVICES:
+             result(ListOutputDevices())
             break;
         default:
             result(FlutterMethodNotImplemented)
@@ -48,5 +52,46 @@ public class MegaBluePlugin: NSObject, FlutterPlugin {
             default: ()
             }
         }
+    }
+
+        func HeadsetIsConnect() -> Int  {
+        let currentRoute = AVAudioSession.sharedInstance().currentRoute
+        for output in currentRoute.outputs {
+            let portType = output.portType
+            if portType == AVAudioSession.Port.headphones || portType == AVAudioSession.Port.bluetoothA2DP || portType == AVAudioSession.Port.bluetoothHFP {
+                return 1
+            } else {
+                return 0
+            }
+        }
+        return 0
+    }
+
+    func HeadsetDeviceName() -> String {
+        let currentRoute = AVAudioSession.sharedInstance().currentRoute
+        for output in currentRoute.outputs {
+            let portName = output.portName
+            return portName
+        }
+        return ""
+    }
+
+    func ListOutputDevices() -> [[String: String]] {
+        let audioSession = AVAudioSession.sharedInstance()
+        var outputDevices: [[String: String]] = []
+        do {
+            try audioSession.setCategory(.playAndRecord, mode: .default)
+            try audioSession.setActive(true)
+
+            let currentRoute = audioSession.currentRoute
+            for port in currentRoute.outputs {
+                print("Output Port: \(port.portType)")
+                print("Output Name: \(port.portName)")
+                print("Output UID: \(port.uid)")
+            }
+        } catch {
+            print("Error setting audio session category.")
+        }
+        return outputDevices
     }
 }
