@@ -1,9 +1,12 @@
 import Flutter
 import UIKit
 import AVFoundation
+import CoreBluetooth
 
-public class MegaBluePlugin: NSObject, FlutterPlugin {
+public class MegaBluePlugin: NSObject, FlutterPlugin, CBCentralManagerDelegate, CBPeripheralDelegate {
     var channel : FlutterMethodChannel?
+    var peripheral: CBPeripheral?
+    var centralManager: CBCentralManager!
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "megaflutter/mega_blue", binaryMessenger: registrar.messenger())
@@ -15,6 +18,15 @@ public class MegaBluePlugin: NSObject, FlutterPlugin {
     private let CURRENT_STATE = "getCurrentState"
     private let DEVICE_NAME = "getDeviceName"
     private let LIST_DEVICES = "listAllAudioDevices"
+    private let CONNECT = "connect"
+    
+    public func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        if central.state == .poweredOn {
+            centralManager.scanForPeripherals(withServices: nil, options: nil)
+        } else {
+            print("Bluetooth não está disponível.")
+        }
+    }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
@@ -25,7 +37,11 @@ public class MegaBluePlugin: NSObject, FlutterPlugin {
             result(HeadsetDeviceName())
             break;
         case LIST_DEVICES:
-             result(ListOutputDevices())
+            result(ListOutputDevices())
+            break;
+        case CONNECT:
+            let uid = call.arguments as! String
+            ConnectHeadset(uid: uid)
             break;
         default:
             result(FlutterMethodNotImplemented)
@@ -35,6 +51,7 @@ public class MegaBluePlugin: NSObject, FlutterPlugin {
     public override init() {
         super.init()
         registerAudioRouteChangeBlock()
+        centralManager = CBCentralManager(delegate: self, queue: nil)
     }
     
     func registerAudioRouteChangeBlock(){
@@ -53,8 +70,8 @@ public class MegaBluePlugin: NSObject, FlutterPlugin {
             }
         }
     }
-
-        func HeadsetIsConnect() -> Int  {
+    
+    func HeadsetIsConnect() -> Int  {
         let currentRoute = AVAudioSession.sharedInstance().currentRoute
         for output in currentRoute.outputs {
             let portType = output.portType
@@ -66,7 +83,7 @@ public class MegaBluePlugin: NSObject, FlutterPlugin {
         }
         return 0
     }
-
+    
     func HeadsetDeviceName() -> String {
         let currentRoute = AVAudioSession.sharedInstance().currentRoute
         for output in currentRoute.outputs {
@@ -75,7 +92,7 @@ public class MegaBluePlugin: NSObject, FlutterPlugin {
         }
         return ""
     }
-
+    
     func ListOutputDevices() -> [[String: String]] {
         var outputDevices: [[String: String]] = []
         let currentRoute = AVAudioSession.sharedInstance().currentRoute
@@ -85,5 +102,15 @@ public class MegaBluePlugin: NSObject, FlutterPlugin {
             outputDevices.append(["name": portName, "uid": uid])
         }
         return outputDevices
+    }
+    
+    func ConnectHeadset(uid: String) {
+        print("ConnectHeadset")
+        print(uid)
+        let targetPeripheralUUID = UUID(uuidString: uid)
+        if peripheral?.identifier == targetPeripheralUUID {
+            centralManager.stopScan()
+            centralManager.connect(peripheral!, options: nil)
+        }
     }
 }

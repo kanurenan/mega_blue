@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:flutter/services.dart';
 
 typedef DetectPluggedCallback = Function(HeadsetState payload);
@@ -66,5 +68,9 @@ class MegaBlue {
       case "disconnect":
         return callback(HeadsetState.DISCONNECT);
     }
+  }
+
+  setAudioDevice(String uid) {
+    _channel.invokeMethod('connect', uid);
   }
 }
