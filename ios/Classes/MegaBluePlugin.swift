@@ -77,20 +77,12 @@ public class MegaBluePlugin: NSObject, FlutterPlugin {
     }
 
     func ListOutputDevices() -> [[String: String]] {
-        let audioSession = AVAudioSession.sharedInstance()
         var outputDevices: [[String: String]] = []
-        do {
-            try audioSession.setCategory(.playAndRecord, mode: .default)
-            try audioSession.setActive(true)
-
-            let currentRoute = audioSession.currentRoute
-            for port in currentRoute.outputs {
-                print("Output Port: \(port.portType)")
-                print("Output Name: \(port.portName)")
-                print("Output UID: \(port.uid)")
-            }
-        } catch {
-            print("Error setting audio session category.")
+        let currentRoute = AVAudioSession.sharedInstance().currentRoute
+        for output in currentRoute.outputs {
+            let portName = output.portName
+            let uid = output.uid
+            outputDevices.append(["name": portName, "uid": uid])
         }
         return outputDevices
     }
