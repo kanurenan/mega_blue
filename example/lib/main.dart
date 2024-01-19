@@ -22,7 +22,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    checkPermission();
     initPlatformState();
   }
 
@@ -46,10 +45,6 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _platformVersion = platformVersion;
     });
-  }
-
-  Future<void> checkPermission() async {
-    await _megaBluePlugin.checkPermission();
   }
 
   @override

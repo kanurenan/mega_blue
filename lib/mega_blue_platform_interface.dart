@@ -30,8 +30,4 @@ abstract class MegaBluePlatform extends PlatformInterface {
   Future<bool?> isDeviceConnected() {
     throw UnimplementedError('isDeviceConnected() has not been implemented.');
   }
-
-  Future<void> checkPermission() {
-    throw UnimplementedError('checkPermission() has not been implemented.');
-  }
 }
