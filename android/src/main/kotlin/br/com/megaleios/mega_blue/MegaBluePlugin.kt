@@ -106,7 +106,7 @@ class MegaBluePlugin : FlutterPlugin, MethodCallHandler {
                 val devices = bluetoothDevices.map {
                     mapOf(
                         "name" to it.productName,
-                        "uid" to it.id,
+                        "uid" to it.id.toString(),
                     )
                 }
                 result.success(devices)
