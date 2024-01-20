@@ -67,8 +67,6 @@ class MegaBluePlugin : FlutterPlugin, MethodCallHandler {
 
             for (device in devices) {
                 when (device.type) {
-                    AudioDeviceInfo.TYPE_WIRED_HEADSET,
-                    AudioDeviceInfo.TYPE_WIRED_HEADPHONES,
                     AudioDeviceInfo.TYPE_BLUETOOTH_A2DP,
                     AudioDeviceInfo.TYPE_BLUETOOTH_SCO -> return true
                 }
@@ -76,6 +74,7 @@ class MegaBluePlugin : FlutterPlugin, MethodCallHandler {
             return false
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
@@ -87,21 +86,20 @@ class MegaBluePlugin : FlutterPlugin, MethodCallHandler {
             "getDeviceName" -> {
                 val deviceName = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
                     .firstOrNull {
-                        it.type == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
-                                it.type == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
-                                it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
-                                it.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+                        it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
+                                    it.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
                     }?.productName
+                audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS).map{
+                    println("Device: ${it.productName} - type: ${it.type} - ${it.isSource}")
+                }
                 result.success(deviceName)
             }
 
             "listAllAudioDevices" -> {
                 val bluetoothDevices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
                     .filter {
-                        it.type == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
-                                it.type == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
-                                it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
-                                it.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+                        it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
+                                    it.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
                     }
                 val devices = bluetoothDevices.map {
                     mapOf(
