@@ -1,3 +1,7 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Initial release
+
+## 0.0.2
+
+* Added implementation for get bluetooth state, listen bluetooth state changes and list connected devices

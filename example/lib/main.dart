@@ -45,7 +45,6 @@ class _MyAppState extends State<MyApp> {
 
   void initPlatformState() async {
     _megaBluePlugin.setListener((MegaBlueState state) {
-      log('Headset state: $state', name: '==> FLUTTER <==');
       if (state == MegaBlueState.CONNECT) {
         getAllDevices();
       }
@@ -55,7 +54,6 @@ class _MyAppState extends State<MyApp> {
     });
 
     final state = await _megaBluePlugin.getCurrentState;
-    log('Headset state: $state', name: '==> FLUTTER <==');
     if (state == MegaBlueState.CONNECT) {
       await getAllDevices();
     }
@@ -64,19 +62,18 @@ class _MyAppState extends State<MyApp> {
     });
 
     final deviceName = await _megaBluePlugin.getDeviceName;
-    log('Device name: $deviceName', name: '==> FLUTTER <==');
+    log('Device name: $deviceName');
   }
 
   Future<List<Device>> getAllDevices() async {
     final devices = await _megaBluePlugin.listAllAudioDevices;
-    log('Devices: $devices', name: '==> FLUTTER <==');
-    // final deviceList = devices!
-    //     .map((e) => Device.fromJson(e as Map<dynamic, dynamic>))
-    //     .toList();
-    // setState(() {
-    //   allDevices.addAll(deviceList);
-    // });
-    return [];
+    final deviceList = devices
+        .map((e) => Device.fromJson(e as Map<dynamic, dynamic>))
+        .toList();
+    setState(() {
+      allDevices.addAll(deviceList);
+    });
+    return deviceList;
   }
 
   @override
