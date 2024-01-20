@@ -10,22 +10,19 @@ class MegaBlueBroadcastReceiver(private val listener: MegaBlueEventListener) : B
     override fun onReceive(context: Context?, intent: Intent?) {
        when(intent?.action){
            Intent.ACTION_HEADSET_PLUG -> {
-               val state = intent.getIntExtra("state", -1)
-               when(state){
+               when(intent.getIntExtra("state", -1)){
                    0 -> listener.onDisconnect()
                    1 -> listener.onConnect()
                }
            }
            BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED -> {
-               val state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1)
-               when(state){
+               when(intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1)){
                    BluetoothAdapter.STATE_DISCONNECTED -> listener.onDisconnect()
                    BluetoothAdapter.STATE_CONNECTED -> listener.onConnect()
                }
            }
            BluetoothAdapter.ACTION_STATE_CHANGED -> {
-               val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
-               when(state){
+               when(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)){
                    BluetoothAdapter.STATE_OFF -> listener.onDisconnect()
                    BluetoothAdapter.STATE_ON -> listener.onConnect()
                }

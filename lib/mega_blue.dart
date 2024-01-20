@@ -2,9 +2,9 @@
 
 import 'package:flutter/services.dart';
 
-typedef DetectPluggedCallback = Function(HeadsetState payload);
+typedef DetectPluggedCallback = Function(MegaBlueState payload);
 
-enum HeadsetState {
+enum MegaBlueState {
   CONNECT,
   DISCONNECT,
 }
@@ -27,17 +27,19 @@ class MegaBlue {
     return _instance!;
   }
 
-  //Reads asynchronously the current state of the headset with type [HeadsetState]
-  Future<HeadsetState?> get getCurrentState async {
+  ///Returns the current state of the bluetooth.
+  ///If the bluetooth is connected, it will return MegaBlueState.CONNECT.
+  ///If the bluetooth is disconnected, it will return MegaBlueState.DISCONNECT.
+  Future<MegaBlueState?> get getCurrentState async {
     final state = await _channel.invokeMethod<int?>('getCurrentState');
 
     switch (state) {
       case 0:
-        return HeadsetState.DISCONNECT;
+        return MegaBlueState.DISCONNECT;
       case 1:
-        return HeadsetState.CONNECT;
+        return MegaBlueState.CONNECT;
       default:
-        return HeadsetState.DISCONNECT;
+        return MegaBlueState.DISCONNECT;
     }
   }
 
@@ -45,12 +47,17 @@ class MegaBlue {
     return await _channel.invokeMethod<String>('getDeviceName');
   }
 
-  Future<List<Object?>?> get listAllAudioDevices async {
-    return _channel.invokeMethod<List<Object?>>('listAllAudioDevices');
+  ///Returns a list of all connected audio devices.
+  ///The list contains List<Object?> objects, with name and uid from the device.
+  ///If no device is connected, the list will be empty.
+  Future<List<Object?>> get listAllAudioDevices async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    return await _channel.invokeMethod<List<Object?>>('listAllAudioDevices') ??
+        [];
   }
 
-  //Sets a callback that is called whenever a change in [HeadsetState] happens.
-  //Callback function [onPlugged] must accept a [HeadsetState] parameter.
+  ///This method is used to set the callback for the bluetooth state.
+  ///The callback will return the current state of the bluetooth.
   void setListener(DetectPluggedCallback onPlugged) {
     _detectPluggedCallback = onPlugged;
     _channel.setMethodCallHandler(_handleMethod);
@@ -64,9 +71,9 @@ class MegaBlue {
 
     switch (call.method) {
       case "connect":
-        return callback(HeadsetState.CONNECT);
+        return callback(MegaBlueState.CONNECT);
       case "disconnect":
-        return callback(HeadsetState.DISCONNECT);
+        return callback(MegaBlueState.DISCONNECT);
     }
   }
 

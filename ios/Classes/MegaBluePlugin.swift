@@ -105,8 +105,6 @@ public class MegaBluePlugin: NSObject, FlutterPlugin, CBCentralManagerDelegate, 
     }
     
     func ConnectHeadset(uid: String) {
-        print("ConnectHeadset")
-        print(uid)
         let targetPeripheralUUID = UUID(uuidString: uid)
         if peripheral?.identifier == targetPeripheralUUID {
             centralManager.stopScan()

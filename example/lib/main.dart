@@ -44,38 +44,39 @@ class _MyAppState extends State<MyApp> {
   }
 
   void initPlatformState() async {
-    _megaBluePlugin.setListener((HeadsetState state) {
-      log('Headset state: $state');
-      if (state == HeadsetState.CONNECT) {
+    _megaBluePlugin.setListener((MegaBlueState state) {
+      log('Headset state: $state', name: '==> FLUTTER <==');
+      if (state == MegaBlueState.CONNECT) {
         getAllDevices();
       }
       setState(() {
-        isConnected = state == HeadsetState.CONNECT;
+        isConnected = state == MegaBlueState.CONNECT;
       });
     });
 
     final state = await _megaBluePlugin.getCurrentState;
-    log('Headset state: $state');
-    if (state == HeadsetState.CONNECT) {
+    log('Headset state: $state', name: '==> FLUTTER <==');
+    if (state == MegaBlueState.CONNECT) {
       await getAllDevices();
     }
     setState(() {
-      isConnected = state == HeadsetState.CONNECT;
+      isConnected = state == MegaBlueState.CONNECT;
     });
 
     final deviceName = await _megaBluePlugin.getDeviceName;
-    log('Device name: $deviceName');
+    log('Device name: $deviceName', name: '==> FLUTTER <==');
   }
 
   Future<List<Device>> getAllDevices() async {
     final devices = await _megaBluePlugin.listAllAudioDevices;
-    final deviceList = devices!
-        .map((e) => Device.fromJson(e as Map<dynamic, dynamic>))
-        .toList();
-    setState(() {
-      allDevices.addAll(deviceList);
-    });
-    return deviceList;
+    log('Devices: $devices', name: '==> FLUTTER <==');
+    // final deviceList = devices!
+    //     .map((e) => Device.fromJson(e as Map<dynamic, dynamic>))
+    //     .toList();
+    // setState(() {
+    //   allDevices.addAll(deviceList);
+    // });
+    return [];
   }
 
   @override
@@ -109,6 +110,10 @@ class _MyAppState extends State<MyApp> {
                     itemCount: allDevices.length,
                   ),
                 ),
+              ElevatedButton(
+                onPressed: () async => getAllDevices(),
+                child: const Text('Get all devices'),
+              ),
               ElevatedButton(
                 onPressed: () async {
                   await player.setUrl(
