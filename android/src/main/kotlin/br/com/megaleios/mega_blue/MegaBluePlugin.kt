@@ -67,8 +67,7 @@ class MegaBluePlugin : FlutterPlugin, MethodCallHandler {
 
             for (device in devices) {
                 when (device.type) {
-                    AudioDeviceInfo.TYPE_BLUETOOTH_A2DP,
-                    AudioDeviceInfo.TYPE_BLUETOOTH_SCO -> return true
+                    AudioDeviceInfo.TYPE_BLUETOOTH_A2DP -> return true
                 }
             }
             return false
@@ -86,20 +85,15 @@ class MegaBluePlugin : FlutterPlugin, MethodCallHandler {
             "getDeviceName" -> {
                 val deviceName = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
                     .firstOrNull {
-                        it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
-                                    it.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+                        it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP
                     }?.productName
-                audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS).map{
-                    println("Device: ${it.productName} - type: ${it.type} - ${it.isSource}")
-                }
                 result.success(deviceName)
             }
 
             "listAllAudioDevices" -> {
                 val bluetoothDevices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
                     .filter {
-                        it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
-                                    it.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+                        it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP
                     }
                 val devices = bluetoothDevices.map {
                     mapOf(
